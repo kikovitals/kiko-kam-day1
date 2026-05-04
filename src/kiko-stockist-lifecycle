@@ -1,0 +1,731 @@
+import { useState } from "react";
+
+const palette = {
+  bg: "#F5F0E8",
+  bgDeep: "#EDE5D8",
+  line: "#D4C5B0",
+  clay: "#B8956A",
+  clayLight: "#D4B896",
+  espresso: "#3D2B1F",
+  mocha: "#7A5C3F",
+  sage: "#6B7F5E",
+  blush: "#C49090",
+  slate: "#5C6B7A",
+  white: "#FFFFFF",
+  ink: "#2A1F14",
+};
+
+const stages = [
+  {
+    id: "intro",
+    number: "01",
+    label: "Introduction",
+    sublabel: "Lead → Qualified Prospect",
+    color: palette.slate,
+    icon: "◎",
+    timeframe: "Week 1",
+    owner: "Toni (lead gen) → KAM (qualified)",
+    objective: "Identify the right stockists, make a strong first impression, and qualify before investing time.",
+    actions: [
+      {
+        actor: "KIKO",
+        items: [
+          "Prospect identified via Toni's lead gen pipeline (monday Lead Gen board)",
+          "Initial outreach — email or call introducing KIKO Vitals",
+          "Send brand overview / product one-pager",
+          "Qualify: right fit? right location? right customer profile?",
+          "Book intro call if qualified",
+          "Log all activity in monday CRM immediately",
+        ],
+      },
+      {
+        actor: "Stockist",
+        items: [
+          "Receives intro communication",
+          "Reviews KIKO brand and product offering",
+          "Agrees to or declines intro call",
+        ],
+      },
+    ],
+    tools: ["monday.com (Lead Gen board)", "Gmail (logged to CRM)", "KIKO brand one-pager"],
+    outputs: ["Qualified: move to Onboarding stage", "Not qualified: archive in CRM with reason"],
+    qualGates: [
+      "Aligned customer profile (wellness, natural, health-conscious)",
+      "Geographic fit — no cannibalisation of existing nearby stockist",
+      "Operational capacity to hold and sell KIKO range",
+      "Decision-maker engaged (not just a buyer's assistant)",
+    ],
+    redFlags: [
+      "Wants to stock one SKU only",
+      "No dedicated wellness / natural health section",
+      "Already stocks a direct competing brand exclusively",
+    ],
+  },
+  {
+    id: "onboarding",
+    number: "02",
+    label: "Onboarding",
+    sublabel: "Prospect → Active Stockist",
+    color: palette.clay,
+    icon: "◈",
+    timeframe: "Weeks 1–3",
+    owner: "KAM",
+    objective: "Get the stockist legally set up, commercially agreed, and placing their opening order with confidence.",
+    actions: [
+      {
+        actor: "KIKO",
+        items: [
+          "Send Stockist Agreement & T&Cs for signature",
+          "Agree payment terms (COD / 30-day / payment plan — see payment framework)",
+          "Confirm opening order minimum and range recommendation",
+          "Create stockist profile in Cin7 (manual — must happen before portal access)",
+          "Send B2B portal login credentials",
+          "Walk stockist through portal: how to browse, order, view invoices",
+          "Send physical Onboarding Pack (see pack contents below)",
+          "Confirm opening order placed and processing",
+        ],
+      },
+      {
+        actor: "Stockist",
+        items: [
+          "Signs T&Cs and stockist agreement",
+          "Agrees payment terms",
+          "Receives and reviews onboarding pack",
+          "Logs into B2B portal",
+          "Places opening order",
+        ],
+      },
+    ],
+    tools: ["Cin7 (profile creation + B2B portal)", "monday CRM (status update)", "Gmail", "DocuSign or PDF T&Cs"],
+    onboardingPack: [
+      "Welcome letter from CEO",
+      "KIKO brand story & product education guide",
+      "Full product catalogue with RRP and wholesale pricing",
+      "Payment terms summary",
+      "Shelf talker templates (print-ready files)",
+      "Social media assets (for their own channels)",
+      "Product training materials / video links",
+      "KIKO B2B portal how-to guide",
+      "Key contacts list (who to call for what)",
+    ],
+    paymentOptions: [
+      { plan: "COD (Cash on Delivery)", detail: "Full payment on dispatch. New stockists default here.", flag: "default" },
+      { plan: "30-Day Terms", detail: "Invoice due 30 days from dispatch. Available after first successful COD order.", flag: "standard" },
+      { plan: "Payment Plan", detail: "Agreed instalments for larger opening orders. Approved by Kerri-lee case by case.", flag: "approval" },
+    ],
+    outputs: ["Cin7 profile live", "T&Cs signed", "Opening order placed", "Onboarding pack received"],
+    qualGates: [
+      "T&Cs signed before any stock dispatched — no exceptions",
+      "Cin7 profile created before portal access granted",
+      "Opening order minimum met",
+    ],
+    redFlags: [
+      "Wants stock before signing T&Cs",
+      "Requests payment terms on first order without prior relationship",
+      "Won't engage with product training",
+    ],
+  },
+  {
+    id: "launch",
+    number: "03",
+    label: "Launch & Merchandising",
+    sublabel: "First Order → In-Store & Live",
+    color: palette.sage,
+    icon: "◉",
+    timeframe: "Weeks 2–4",
+    owner: "KAM",
+    objective: "Make sure KIKO is displayed correctly, staff are confident selling it, and the stockist feels supported at launch.",
+    actions: [
+      {
+        actor: "KIKO",
+        items: [
+          "Confirm stock received by stockist",
+          "Send merchandising guide (planogram, display standards)",
+          "Provide shelf talker files — confirm printed and placed",
+          "Offer in-store visit or virtual check-in to review display",
+          "Deliver or send product training for store staff",
+          "Share social media launch assets — encourage stockist to post",
+          "Tag stockist in KIKO social content where possible",
+          "Launch check-in call: any questions, any issues",
+        ],
+      },
+      {
+        actor: "Stockist",
+        items: [
+          "Receives and unpacks opening order",
+          "Sets up display per KIKO merchandising guide",
+          "Prints and places shelf talkers",
+          "Staff complete product training",
+          "Posts launch content on their own channels (encouraged)",
+        ],
+      },
+    ],
+    tools: ["monday CRM (launch checklist)", "Gmail", "WhatsApp (informal check-ins)", "Google Drive (merchandising assets)"],
+    merchandisingStandards: [
+      "KIKO products grouped together — never split across categories",
+      "Hero SKUs at eye level",
+      "Shelf talkers affixed at shelf edge, not handwritten alternatives",
+      "Price labels match KIKO RRP — no unauthorised discounting",
+      "Display clean, no damaged packaging on shelf",
+      "Minimum 2 facings per SKU for core range",
+    ],
+    outputs: ["Stock on shelf", "Shelf talkers placed", "Staff trained", "Launch check-in completed", "Social content posted"],
+    redFlags: [
+      "Stock sitting in storeroom, not on shelf after 2 weeks",
+      "Shelf talkers not used — KIKO brand invisible",
+      "Staff have no product knowledge",
+      "Stockist discounting below RRP without approval",
+    ],
+  },
+  {
+    id: "support",
+    number: "04",
+    label: "Ongoing Support",
+    sublabel: "Active Stockist Management",
+    color: palette.mocha,
+    icon: "◇",
+    timeframe: "Ongoing",
+    owner: "KAM",
+    objective: "Keep the stockist ordering, engaged, and growing. Be their most reliable supplier relationship.",
+    actions: [
+      {
+        actor: "KIKO",
+        items: [
+          "Regular check-in cadence (independent: monthly / chain: per agreed schedule)",
+          "Proactive reorder reminders before stock runs low",
+          "Share new product launches with advance notice",
+          "Provide promotional support materials for campaigns",
+          "Answer queries within 24 hours (product, orders, logistics)",
+          "Invite to KIKO training events and webinars",
+          "Flag any Cin7 or portal issues immediately",
+          "Annual range review: what's working, what to grow",
+        ],
+      },
+      {
+        actor: "Stockist",
+        items: [
+          "Places reorders via B2B portal",
+          "Participates in product training updates",
+          "Maintains display standards",
+          "Communicates sell-through feedback",
+        ],
+      },
+    ],
+    tools: ["monday CRM (all touchpoints logged)", "Cin7 (order history, reorder tracking)", "Gmail", "Klaviyo (if consumer-facing comms overlap)"],
+    checkInCadence: [
+      { type: "Independent stockist", frequency: "Monthly call or visit", notes: "KAM-led" },
+      { type: "Chain retailer (e.g. Dis-Chem)", frequency: "Per head office schedule", notes: "Separate account management protocol" },
+      { type: "High-value independent", frequency: "Fortnightly", notes: "Top tier accounts" },
+      { type: "Low-activity account", frequency: "Triggered by reactivation flag", notes: "60-day no-order automation" },
+    ],
+    faqTopics: [
+      "How do I place a reorder?",
+      "Where do I find my invoice?",
+      "What are my payment terms?",
+      "Can I return slow-moving stock?",
+      "How do I get more shelf talkers / POS materials?",
+      "When is the next new product launching?",
+      "How do I get product training for new staff?",
+      "Who do I contact for delivery issues?",
+    ],
+    outputs: ["Regular orders maintained", "NPS / relationship health tracked", "Display standards maintained", "Staff trained on new products"],
+    redFlags: [
+      "No order in 45 days (pre-reactivation warning)",
+      "Complaints about stock quality or delivery not resolved quickly",
+      "Stockist selling below RRP repeatedly",
+      "Display standards deteriorating — no response to feedback",
+    ],
+  },
+  {
+    id: "reactivation",
+    number: "05",
+    label: "Reactivation",
+    sublabel: "Lapsed → Re-engaged or Offboarded",
+    color: palette.blush,
+    icon: "◆",
+    timeframe: "Triggered at 60 days no order",
+    owner: "KAM + Toni",
+    objective: "Win back lapsed stockists efficiently. Understand why they stopped. Either re-engage or offboard cleanly.",
+    actions: [
+      {
+        actor: "KIKO",
+        items: [
+          "monday automation fires at 60 days no order — flags to KAM",
+          "KAM reviews account history: last order, last contact, any issues",
+          "Reactivation outreach: warm, personal — not generic",
+          "Identify root cause: price, competition, sell-through, relationship?",
+          "Offer reactivation incentive if appropriate (case by case — Kerri-lee approval)",
+          "If re-engaged: update Cin7 and CRM, restart support cadence",
+          "If not re-engaging: offboard cleanly, log reason, remove from active CRM",
+        ],
+      },
+      {
+        actor: "Stockist",
+        items: [
+          "Receives reactivation outreach",
+          "Provides feedback on why they stopped ordering",
+          "Decides: re-engage or exit",
+        ],
+      },
+    ],
+    tools: ["monday CRM (reactivation automation)", "Cin7 (order history review)", "Gmail"],
+    reactivationScript: [
+      "Open with genuine relationship reference — not a template",
+      "Acknowledge the gap without being accusatory",
+      "Ask what's changed — listen before pitching",
+      "Share what's new at KIKO since their last order",
+      "Offer a low-friction next step (small reorder, trial of new SKU)",
+      "If they say no — ask for honest feedback and exit gracefully",
+    ],
+    offboardChecklist: [
+      "Log reason for lapsing in monday CRM",
+      "Mark account as Inactive in Cin7",
+      "Update Stockist Master List status",
+      "Remove from active check-in schedule",
+      "Leave door open: 'We'd love to work together again when the time is right'",
+    ],
+    outputs: ["Re-engaged: back into Ongoing Support stage", "Offboarded: cleanly logged and archived"],
+    redFlags: [
+      "Reactivation attempted without reviewing account history first",
+      "Offering discounts without Kerri-lee approval",
+      "Generic bulk reactivation email — kills relationship credibility",
+    ],
+  },
+];
+
+const STAGE_IDS = stages.map(s => s.id);
+
+export default function StockistLifecycle() {
+  const [active, setActive] = useState("intro");
+  const [section, setSection] = useState("actions");
+
+  const stage = stages.find(s => s.id === active);
+  const stageIndex = STAGE_IDS.indexOf(active);
+
+  const sectionTabs = [
+    { id: "actions", label: "Actions" },
+    { id: "tools", label: "Tools & Outputs" },
+    { id: "detail", label: stage?.id === "onboarding" ? "Pack & Payment" : stage?.id === "launch" ? "Merchandising" : stage?.id === "support" ? "Cadence & FAQs" : stage?.id === "reactivation" ? "Scripts & Offboard" : "Qualification" },
+    { id: "flags", label: "Red Flags" },
+  ];
+
+  return (
+    <div style={{
+      fontFamily: "'Garamond', 'Georgia', serif",
+      background: palette.bg,
+      minHeight: "100vh",
+      color: palette.ink,
+    }}>
+      {/* Header */}
+      <div style={{
+        background: palette.espresso,
+        color: palette.bg,
+        padding: "36px 48px 32px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", bottom: -60, right: -30,
+          width: 280, height: 280, borderRadius: "50%",
+          border: `1px solid rgba(212,184,150,0.12)`,
+        }} />
+        <div style={{
+          position: "absolute", bottom: -20, right: 80,
+          width: 140, height: 140, borderRadius: "50%",
+          border: `1px solid rgba(212,184,150,0.08)`,
+        }} />
+        <div style={{ fontSize: 9, letterSpacing: 6, textTransform: "uppercase", color: palette.clay, marginBottom: 12 }}>
+          KIKO Vitals · B2B Operations
+        </div>
+        <h1 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 400, letterSpacing: -0.3 }}>
+          Stockist Lifecycle System
+        </h1>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(245,240,232,0.55)", maxWidth: 520 }}>
+          The complete framework from first contact to long-term account management. Every stage, every action, every owner.
+        </p>
+      </div>
+
+      {/* Pipeline strip */}
+      <div style={{
+        background: palette.espresso,
+        padding: "0 48px 24px",
+        display: "flex",
+        gap: 0,
+        alignItems: "stretch",
+      }}>
+        {stages.map((s, i) => {
+          const isActive = active === s.id;
+          const isPast = stageIndex > i;
+          return (
+            <div key={s.id} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+              <button
+                onClick={() => { setActive(s.id); setSection("actions"); }}
+                style={{
+                  flex: 1,
+                  background: isActive ? s.color : isPast ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
+                  border: isActive ? `none` : "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 6,
+                  padding: "12px 14px",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  textAlign: "left",
+                  transition: "all 0.2s",
+                }}
+              >
+                <div style={{ fontSize: 10, color: isActive ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.25)", marginBottom: 4, letterSpacing: 2 }}>
+                  {s.number}
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? palette.white : "rgba(255,255,255,0.45)", lineHeight: 1.3 }}>
+                  {s.label}
+                </div>
+              </button>
+              {i < stages.length - 1 && (
+                <div style={{ color: "rgba(255,255,255,0.15)", fontSize: 16, padding: "0 6px" }}>›</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Stage content */}
+      <div style={{ padding: "36px 48px", maxWidth: 860, margin: "0 auto" }}>
+
+        {/* Stage header */}
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+          marginBottom: 8, flexWrap: "wrap", gap: 12,
+        }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
+              <span style={{ fontSize: 20, color: stage.color }}>{stage.icon}</span>
+              <span style={{ fontSize: 10, letterSpacing: 4, textTransform: "uppercase", color: stage.color }}>
+                Stage {stage.number}
+              </span>
+            </div>
+            <h2 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 400 }}>{stage.label}</h2>
+            <p style={{ margin: 0, fontSize: 13, color: palette.mocha, fontStyle: "italic" }}>{stage.sublabel}</p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+            <div style={{
+              background: stage.color, color: palette.white,
+              borderRadius: 4, padding: "5px 12px",
+              fontSize: 11, letterSpacing: 0.5,
+            }}>
+              {stage.timeframe}
+            </div>
+            <div style={{
+              background: palette.bgDeep, color: palette.mocha,
+              borderRadius: 4, padding: "5px 12px",
+              fontSize: 11,
+            }}>
+              Owner: {stage.owner}
+            </div>
+          </div>
+        </div>
+
+        {/* Objective */}
+        <div style={{
+          background: palette.white,
+          border: `1px solid ${palette.line}`,
+          borderLeft: `4px solid ${stage.color}`,
+          borderRadius: 8,
+          padding: "14px 20px",
+          marginBottom: 24,
+          fontSize: 14,
+          color: palette.espresso,
+          lineHeight: 1.65,
+        }}>
+          <strong>Objective:</strong> {stage.objective}
+        </div>
+
+        {/* Section tabs */}
+        <div style={{
+          display: "flex", gap: 0,
+          borderBottom: `2px solid ${palette.line}`,
+          marginBottom: 24,
+        }}>
+          {sectionTabs.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setSection(t.id)}
+              style={{
+                background: "none", border: "none",
+                borderBottom: section === t.id ? `2px solid ${stage.color}` : "2px solid transparent",
+                padding: "10px 20px",
+                fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase",
+                color: section === t.id ? stage.color : palette.mocha,
+                cursor: "pointer", fontFamily: "inherit",
+                marginBottom: -2, transition: "all 0.15s",
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ACTIONS */}
+        {section === "actions" && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {stage.actions.map((a, ai) => (
+              <div key={ai} style={{
+                background: palette.white,
+                border: `1px solid ${palette.line}`,
+                borderRadius: 8,
+                overflow: "hidden",
+              }}>
+                <div style={{
+                  background: ai === 0 ? stage.color : palette.bgDeep,
+                  color: ai === 0 ? palette.white : palette.mocha,
+                  padding: "10px 18px",
+                  fontSize: 11, letterSpacing: 2, textTransform: "uppercase", fontWeight: 700,
+                }}>
+                  {a.actor} does
+                </div>
+                <div style={{ padding: "14px 18px" }}>
+                  {a.items.map((item, ii) => (
+                    <div key={ii} style={{
+                      display: "flex", gap: 10, alignItems: "flex-start",
+                      padding: "6px 0",
+                      borderBottom: ii < a.items.length - 1 ? `1px solid ${palette.bgDeep}` : "none",
+                    }}>
+                      <div style={{
+                        width: 16, height: 16, minWidth: 16,
+                        border: `1.5px solid ${stage.color}`,
+                        borderRadius: 3, marginTop: 2,
+                      }} />
+                      <span style={{ fontSize: 13, color: palette.espresso, lineHeight: 1.5 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* TOOLS & OUTPUTS */}
+        {section === "tools" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{
+              background: palette.white, border: `1px solid ${palette.line}`,
+              borderRadius: 8, padding: "20px 24px",
+            }}>
+              <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.slate, marginBottom: 14 }}>
+                Tools used in this stage
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {stage.tools.map((t, i) => (
+                  <span key={i} style={{
+                    background: palette.bgDeep, color: palette.mocha,
+                    borderRadius: 4, padding: "6px 12px", fontSize: 12,
+                    border: `1px solid ${palette.line}`,
+                  }}>{t}</span>
+                ))}
+              </div>
+            </div>
+
+            <div style={{
+              background: palette.white, border: `1px solid ${palette.line}`,
+              borderRadius: 8, padding: "20px 24px",
+            }}>
+              <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.sage, marginBottom: 14 }}>
+                ✓ Stage complete when
+              </div>
+              {stage.outputs.map((o, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8 }}>
+                  <span style={{ color: palette.sage, fontSize: 14, marginTop: 1 }}>◆</span>
+                  <span style={{ fontSize: 13.5, color: palette.espresso, lineHeight: 1.5 }}>{o}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* DETAIL SECTION — varies by stage */}
+        {section === "detail" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+            {/* Intro — qualification */}
+            {stage.id === "intro" && (<>
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, padding: "20px 24px" }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.sage, marginBottom: 14 }}>Qualification criteria — move forward if ALL met</div>
+                {stage.qualGates.map((q, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8 }}>
+                    <span style={{ color: palette.sage, marginTop: 2 }}>✓</span>
+                    <span style={{ fontSize: 13.5, color: palette.espresso, lineHeight: 1.5 }}>{q}</span>
+                  </div>
+                ))}
+              </div>
+            </>)}
+
+            {/* Onboarding — pack & payment */}
+            {stage.id === "onboarding" && (<>
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, padding: "20px 24px" }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.clay, marginBottom: 14 }}>Onboarding Pack Contents</div>
+                {stage.onboardingPack.map((item, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8 }}>
+                    <div style={{ width: 16, height: 16, minWidth: 16, border: `1.5px solid ${palette.clay}`, borderRadius: 3, marginTop: 2 }} />
+                    <span style={{ fontSize: 13.5, color: palette.espresso, lineHeight: 1.5 }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, overflow: "hidden" }}>
+                <div style={{ background: palette.espresso, color: palette.bg, padding: "10px 20px", fontSize: 10, letterSpacing: 3, textTransform: "uppercase" }}>
+                  Payment Plan Options
+                </div>
+                {stage.paymentOptions.map((p, i) => (
+                  <div key={i} style={{
+                    display: "flex", gap: 16, alignItems: "flex-start",
+                    padding: "16px 20px",
+                    borderBottom: i < stage.paymentOptions.length - 1 ? `1px solid ${palette.bgDeep}` : "none",
+                    background: p.flag === "default" ? "rgba(107,127,94,0.05)" : "transparent",
+                  }}>
+                    <div style={{ minWidth: 120 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: palette.espresso }}>{p.plan}</div>
+                      {p.flag === "default" && <span style={{ fontSize: 9, background: palette.sage, color: palette.white, borderRadius: 3, padding: "1px 6px", letterSpacing: 1 }}>DEFAULT</span>}
+                      {p.flag === "approval" && <span style={{ fontSize: 9, background: palette.blush, color: palette.white, borderRadius: 3, padding: "1px 6px", letterSpacing: 1 }}>CEO APPROVAL</span>}
+                    </div>
+                    <span style={{ fontSize: 13, color: palette.mocha, lineHeight: 1.5 }}>{p.detail}</span>
+                  </div>
+                ))}
+              </div>
+            </>)}
+
+            {/* Launch — merchandising */}
+            {stage.id === "launch" && (
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, padding: "20px 24px" }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.sage, marginBottom: 14 }}>
+                  Merchandising Standards — Non-Negotiable
+                </div>
+                {stage.merchandisingStandards.map((s, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
+                    <span style={{ color: palette.sage, fontSize: 14, marginTop: 1 }}>◆</span>
+                    <span style={{ fontSize: 13.5, color: palette.espresso, lineHeight: 1.5 }}>{s}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Support — cadence & FAQs */}
+            {stage.id === "support" && (<>
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, overflow: "hidden" }}>
+                <div style={{ background: palette.espresso, color: palette.bg, padding: "10px 20px", fontSize: 10, letterSpacing: 3, textTransform: "uppercase" }}>
+                  Check-in Cadence by Account Type
+                </div>
+                {stage.checkInCadence.map((c, i) => (
+                  <div key={i} style={{
+                    display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr",
+                    padding: "14px 20px", gap: 12,
+                    borderBottom: i < stage.checkInCadence.length - 1 ? `1px solid ${palette.bgDeep}` : "none",
+                    background: i % 2 === 0 ? palette.white : palette.bg,
+                  }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: palette.espresso }}>{c.type}</span>
+                    <span style={{ fontSize: 13, color: palette.clay }}>{c.frequency}</span>
+                    <span style={{ fontSize: 12, color: palette.mocha }}>{c.notes}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, padding: "20px 24px" }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.slate, marginBottom: 14 }}>
+                  FAQ Topics — Know These Cold
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {stage.faqTopics.map((faq, i) => (
+                    <div key={i} style={{
+                      background: palette.bgDeep, borderRadius: 6,
+                      padding: "10px 14px", fontSize: 12.5,
+                      color: palette.espresso, lineHeight: 1.4,
+                    }}>
+                      {faq}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>)}
+
+            {/* Reactivation — scripts & offboard */}
+            {stage.id === "reactivation" && (<>
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, padding: "20px 24px" }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.clay, marginBottom: 14 }}>
+                  Reactivation Outreach — Approach Guide
+                </div>
+                {stage.reactivationScript.map((s, i) => (
+                  <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
+                    <div style={{
+                      width: 22, height: 22, minWidth: 22,
+                      background: palette.clay, color: palette.white,
+                      borderRadius: "50%", display: "flex", alignItems: "center",
+                      justifyContent: "center", fontSize: 10, fontWeight: 700,
+                    }}>{i + 1}</div>
+                    <span style={{ fontSize: 13.5, color: palette.espresso, lineHeight: 1.55, marginTop: 2 }}>{s}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: palette.white, border: `1px solid ${palette.line}`, borderRadius: 8, padding: "20px 24px" }}>
+                <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: palette.blush, marginBottom: 14 }}>
+                  Offboard Checklist — If Not Re-engaging
+                </div>
+                {stage.offboardChecklist.map((item, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8 }}>
+                    <div style={{ width: 16, height: 16, minWidth: 16, border: `1.5px solid ${palette.blush}`, borderRadius: 3, marginTop: 2 }} />
+                    <span style={{ fontSize: 13.5, color: palette.espresso, lineHeight: 1.5 }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </>)}
+          </div>
+        )}
+
+        {/* RED FLAGS */}
+        {section === "flags" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <p style={{ margin: "0 0 8px", fontSize: 13, color: palette.mocha, lineHeight: 1.6 }}>
+              These are signals that something is off. Don't ignore them — flag to KAM or CSO immediately.
+            </p>
+            {stage.redFlags.map((flag, i) => (
+              <div key={i} style={{
+                display: "flex", gap: 14, alignItems: "flex-start",
+                background: "rgba(196,144,144,0.08)",
+                border: "1px solid rgba(196,144,144,0.25)",
+                borderLeft: `4px solid ${palette.blush}`,
+                borderRadius: 8, padding: "16px 20px",
+              }}>
+                <span style={{ color: palette.blush, fontSize: 16, marginTop: 1 }}>⚠</span>
+                <span style={{ fontSize: 14, color: palette.espresso, lineHeight: 1.55 }}>{flag}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Stage nav */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, paddingTop: 24, borderTop: `1px solid ${palette.line}` }}>
+          <button
+            onClick={() => { setActive(STAGE_IDS[stageIndex - 1]); setSection("actions"); }}
+            disabled={stageIndex === 0}
+            style={{
+              background: "none", border: `1px solid ${palette.line}`,
+              borderRadius: 6, padding: "10px 20px", fontSize: 12,
+              color: stageIndex === 0 ? palette.line : palette.mocha,
+              cursor: stageIndex === 0 ? "default" : "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            ← Previous stage
+          </button>
+          <button
+            onClick={() => { setActive(STAGE_IDS[stageIndex + 1]); setSection("actions"); }}
+            disabled={stageIndex === stages.length - 1}
+            style={{
+              background: stageIndex === stages.length - 1 ? palette.bgDeep : palette.espresso,
+              border: "none", borderRadius: 6, padding: "10px 20px", fontSize: 12,
+              color: stageIndex === stages.length - 1 ? palette.line : palette.bg,
+              cursor: stageIndex === stages.length - 1 ? "default" : "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            Next stage →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
