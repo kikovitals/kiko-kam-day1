@@ -1,0 +1,697 @@
+import { useState } from "react";
+
+const brand = {
+  cream: "#FAF7F2",
+  sand: "#E8E0D5",
+  clay: "#C4A882",
+  mocha: "#8B6B4A",
+  espresso: "#3D2B1F",
+  sage: "#7A8C6E",
+  blush: "#D4A5A0",
+  white: "#FFFFFF",
+};
+
+const phases = [
+  {
+    id: "pre",
+    label: "Pre-Arrival",
+    days: "Before Day 1",
+    icon: "◎",
+    color: brand.clay,
+    owner: "People & Culture",
+    sections: [
+      {
+        title: "Admin Setup",
+        items: [
+          "Send offer letter & contract for signature",
+          "Collect banking, tax, and personal info",
+          "Add to payroll system",
+          "Order equipment (laptop, phone if applicable)",
+          "Set up email address & Slack account",
+        ],
+      },
+      {
+        title: "Systems Access",
+        items: [
+          "monday.com — invite to relevant boards",
+          "Cin7 Core — create user profile with correct permissions",
+          "Shopify — view access",
+          "Klaviyo — view access",
+          "Google Workspace — Drive, Docs, Gmail",
+          "Slack — add to relevant channels",
+        ],
+      },
+      {
+        title: "Welcome Pack",
+        items: [
+          "Send welcome email with first-day logistics",
+          "Share pre-reading: KIKO brand deck & brand bible",
+          "Share org chart & key contacts list",
+          "Assign onboarding buddy",
+        ],
+      },
+    ],
+  },
+  {
+    id: "week1",
+    label: "Week 1",
+    days: "Days 1–5",
+    icon: "①",
+    color: brand.sage,
+    owner: "Manager + Buddy",
+    sections: [
+      {
+        title: "Day 1 — Welcome & Culture",
+        items: [
+          "Office/team intro & workspace tour",
+          "CEO welcome session: KIKO story, mission, values",
+          "Meet the team (structured introductions)",
+          "Review communication norms & working hours",
+          "Walk through Slack channels & etiquette",
+          "Lunch with buddy or team",
+        ],
+      },
+      {
+        title: "Days 2–3 — Brand & Product",
+        items: [
+          "KIKO brand deep-dive: positioning, tone, aesthetic",
+          "Product range walkthrough — ingredients, claims, hero SKUs",
+          "Customer persona & target market session",
+          "Review KIKO social presence & content pillars",
+          "Try the products — personal experience is essential",
+        ],
+      },
+      {
+        title: "Days 4–5 — Systems Orientation",
+        items: [
+          "monday.com walkthrough — workspace structure, naming conventions, how we work",
+          "Cin7 Core orientation — inventory, B2B portal basics",
+          "Google Drive — folder structure, filing conventions",
+          "Klaviyo overview (if relevant to role)",
+          "Shopify orientation (if relevant to role)",
+          "Review KIKO platform responsibility map (which tool owns what)",
+        ],
+      },
+    ],
+  },
+  {
+    id: "week2",
+    label: "Weeks 2–4",
+    days: "Days 6–30",
+    icon: "②",
+    color: brand.mocha,
+    owner: "Manager",
+    sections: [
+      {
+        title: "Processes & Operations",
+        items: [
+          "Review KIKO Standard Operating Procedures (SOPs) library",
+          "Finance basics: expense process, invoicing, purchase orders",
+          "Logistics overview: fulfilment flow, courier relationships",
+          "Retailer landscape: chain vs independent, key account overview",
+          "KIKO reporting rhythm: what gets tracked, when, by whom",
+        ],
+      },
+      {
+        title: "Role Immersion",
+        items: [
+          "Shadow relevant team members in daily tasks",
+          "Begin role-specific onboarding track (see Layer 2)",
+          "First 1:1 with manager — align on 30-day priorities",
+          "Attend first team meeting or stand-up",
+          "Complete first independent task (manager-assigned)",
+        ],
+      },
+      {
+        title: "30-Day Check-in",
+        items: [
+          "Formal 1:1 with manager: what's working, what's unclear",
+          "Systems confidence check — any gaps in access or understanding",
+          "Culture check-in with buddy",
+          "Update 60-day priorities together",
+        ],
+      },
+    ],
+  },
+  {
+    id: "month2",
+    label: "Days 31–60",
+    days: "Month 2",
+    icon: "③",
+    color: brand.blush,
+    owner: "Manager",
+    sections: [
+      {
+        title: "Building Ownership",
+        items: [
+          "Take full ownership of defined responsibilities",
+          "Lead at least one process or project independently",
+          "Build key internal and external relationships for role",
+          "Complete any outstanding system training modules",
+        ],
+      },
+      {
+        title: "60-Day Check-in",
+        items: [
+          "Formal performance conversation: progress vs expectations",
+          "KPI review — are targets clearly understood?",
+          "Identify any support, training, or resource needs",
+          "Confirm 90-day goals",
+        ],
+      },
+    ],
+  },
+  {
+    id: "month3",
+    label: "Days 61–90",
+    days: "Month 3",
+    icon: "④",
+    color: brand.espresso,
+    owner: "CSO + CEO",
+    sections: [
+      {
+        title: "Performing Independently",
+        items: [
+          "Operating fully independently in role",
+          "Contributing to team planning and strategy",
+          "Flagging improvements, gaps, or opportunities proactively",
+          "Mentoring future onboardees in role-specific knowledge (where applicable)",
+        ],
+      },
+      {
+        title: "90-Day Review",
+        items: [
+          "Formal review with manager: full 30/60/90 reflection",
+          "CEO touchpoint: culture, growth, trajectory conversation",
+          "Confirm ongoing KPIs and OKRs",
+          "Offboard from 'onboarding' — transition to performance rhythm",
+        ],
+      },
+    ],
+  },
+];
+
+const roleTrack = {
+  title: "Layer 2 — KAM / B2B Ops Role Track",
+  subtitle: "Runs alongside Layer 1 from Week 2 onwards",
+  color: brand.clay,
+  pillars: [
+    {
+      icon: "◈",
+      title: "Stockist Network",
+      items: [
+        "Understand the 500+ account landscape — chain vs independent",
+        "Key chain accounts: Dis-Chem, Wellness Warehouse, Faithful to Nature — how they're managed",
+        "Independent stockist relationship model",
+        "Stockist Master List on monday CRM — how to read and update it",
+        "Account tiering: how KIKO prioritises accounts",
+      ],
+    },
+    {
+      icon: "◈",
+      title: "Cin7 B2B Portal",
+      items: [
+        "How the B2B portal works for stockists",
+        "Manual profile creation process — current workflow",
+        "Order management: viewing, processing, confirming",
+        "Known limitations and current workarounds",
+        "Escalation path for Cin7 issues",
+      ],
+    },
+    {
+      icon: "◈",
+      title: "monday CRM",
+      items: [
+        "CRM structure: Sales CRM workspace, key boards",
+        "KAM's account management workflow",
+        "Toni's prospecting pipeline — how leads move through stages",
+        "Gmail sync — how communications are logged",
+        "Reactivation automations — what triggers them, what to do",
+        "Naming conventions & column standards",
+      ],
+    },
+    {
+      icon: "◈",
+      title: "Reporting & KPIs",
+      items: [
+        "Weekly reporting rhythm: what you own, where it lives",
+        "Monthly reporting: what feeds the CSO and CEO dashboard",
+        "KPIs for the role: account retention, reactivation, new accounts, order value",
+        "How success is defined at 30 / 60 / 90 days",
+      ],
+    },
+    {
+      icon: "◈",
+      title: "Key Relationships",
+      items: [
+        "KAM — Key Accounts Manager (your direct context)",
+        "Toni Lombard — Junior Sales & Account Rep (prospecting pipeline)",
+        "Sam Barbour — Digital Strategist (not sales, but cross-functional)",
+        "Luke — CSO (direct manager, revenue strategy, escalation)",
+          "Kerri-lee — CEO (business oversight)",
+        "CCFO — external financial advisor (monthly)",
+        "Top 10 stockist contacts — who, relationship history, current status",
+      ],
+    },
+  ],
+};
+
+const contentLibrary = [
+  { doc: "KIKO Brand Bible", owner: "Marketing", lives: "Google Drive", status: "Required" },
+  { doc: "Org Chart & Key Contacts", owner: "People & Culture", lives: "Google Drive", status: "Required" },
+  { doc: "Systems & Platform Map", owner: "Operations", lives: "monday.com Doc", status: "Required" },
+  { doc: "Cin7 B2B Portal SOP", owner: "B2B Ops", lives: "Google Drive", status: "Build" },
+  { doc: "monday.com Framework Doc", owner: "Operations", lives: "monday.com Doc", status: "In Progress" },
+  { doc: "Stockist Network Overview", owner: "B2B Ops", lives: "Google Drive", status: "Build" },
+  { doc: "Product Range Guide", owner: "Marketing", lives: "Google Drive", status: "Required" },
+  { doc: "KIKO SOPs Library", owner: "Operations", lives: "Google Drive", status: "Build" },
+  { doc: "Finance & Expenses Guide", owner: "Finance", lives: "Google Drive", status: "Build" },
+  { doc: "30/60/90 Day Plan Template", owner: "People & Culture", lives: "Google Drive", status: "Build" },
+];
+
+const statusColor = {
+  Required: { bg: "#e8f4e8", text: "#3a7a3a" },
+  "In Progress": { bg: "#fff3e0", text: "#b36b00" },
+  Build: { bg: "#fce4e4", text: "#b33a3a" },
+};
+
+export default function KIKOOnboarding() {
+  const [activePhase, setActivePhase] = useState("pre");
+  const [activeTab, setActiveTab] = useState("framework");
+  const [expandedSections, setExpandedSections] = useState({});
+
+  const toggleSection = (key) => {
+    setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const currentPhase = phases.find((p) => p.id === activePhase);
+
+  return (
+    <div style={{
+      fontFamily: "'Georgia', serif",
+      background: brand.cream,
+      minHeight: "100vh",
+      color: brand.espresso,
+    }}>
+      {/* Header */}
+      <div style={{
+        background: brand.espresso,
+        color: brand.cream,
+        padding: "40px 40px 32px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", top: -40, right: -40,
+          width: 200, height: 200,
+          borderRadius: "50%",
+          background: "rgba(196,168,130,0.15)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: -20, right: 80,
+          width: 100, height: 100,
+          borderRadius: "50%",
+          background: "rgba(196,168,130,0.08)",
+        }} />
+        <div style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", color: brand.clay, marginBottom: 10 }}>
+          KIKO Vitals — People & Culture
+        </div>
+        <h1 style={{ margin: 0, fontSize: 32, fontWeight: 400, letterSpacing: -0.5, lineHeight: 1.2 }}>
+          Onboarding System
+        </h1>
+        <p style={{ margin: "10px 0 0", color: brand.sand, fontSize: 14, fontWeight: 400 }}>
+          Master Framework · Two-Layer Model · 90-Day Journey
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <div style={{
+        display: "flex",
+        gap: 0,
+        background: brand.espresso,
+        padding: "0 40px",
+        borderBottom: `3px solid ${brand.clay}`,
+      }}>
+        {[
+          { id: "framework", label: "Layer 1 — General" },
+          { id: "role", label: "Layer 2 — KAM/B2B Ops" },
+          { id: "content", label: "Content Library" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              background: activeTab === tab.id ? brand.clay : "transparent",
+              color: activeTab === tab.id ? brand.espresso : brand.sand,
+              border: "none",
+              padding: "14px 24px",
+              fontSize: 12,
+              letterSpacing: 1,
+              textTransform: "uppercase",
+              cursor: "pointer",
+              fontFamily: "'Georgia', serif",
+              fontWeight: activeTab === tab.id ? 700 : 400,
+              transition: "all 0.2s",
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ padding: "32px 40px", maxWidth: 900, margin: "0 auto" }}>
+
+        {/* === LAYER 1 === */}
+        {activeTab === "framework" && (
+          <div>
+            <p style={{ margin: "0 0 28px", color: brand.mocha, fontSize: 14, lineHeight: 1.7 }}>
+              Every new KIKO team member completes this track — regardless of role. It builds shared context, culture fluency, and systems confidence before role-specific work begins.
+            </p>
+
+            {/* Phase Nav */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap" }}>
+              {phases.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setActivePhase(p.id)}
+                  style={{
+                    background: activePhase === p.id ? p.color : brand.sand,
+                    color: activePhase === p.id ? brand.white : brand.mocha,
+                    border: "none",
+                    borderRadius: 4,
+                    padding: "10px 18px",
+                    fontSize: 12,
+                    letterSpacing: 0.5,
+                    cursor: "pointer",
+                    fontFamily: "'Georgia', serif",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <span style={{ marginRight: 6 }}>{p.icon}</span>{p.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Phase Detail */}
+            {currentPhase && (
+              <div>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 20,
+                  paddingBottom: 16,
+                  borderBottom: `2px solid ${brand.sand}`,
+                }}>
+                  <div>
+                    <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: brand.clay, marginBottom: 4 }}>
+                      {currentPhase.days}
+                    </div>
+                    <h2 style={{ margin: 0, fontSize: 22, fontWeight: 400 }}>{currentPhase.label}</h2>
+                  </div>
+                  <div style={{
+                    background: currentPhase.color,
+                    color: brand.white,
+                    borderRadius: 4,
+                    padding: "6px 14px",
+                    fontSize: 11,
+                    letterSpacing: 1,
+                    textTransform: "uppercase",
+                  }}>
+                    Owner: {currentPhase.owner}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {currentPhase.sections.map((section, si) => {
+                    const key = `${currentPhase.id}-${si}`;
+                    const isOpen = expandedSections[key] !== false; // default open
+                    return (
+                      <div key={si} style={{
+                        background: brand.white,
+                        border: `1px solid ${brand.sand}`,
+                        borderRadius: 8,
+                        overflow: "hidden",
+                      }}>
+                        <button
+                          onClick={() => toggleSection(key)}
+                          style={{
+                            width: "100%",
+                            background: "none",
+                            border: "none",
+                            padding: "16px 20px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            cursor: "pointer",
+                            fontFamily: "'Georgia', serif",
+                          }}
+                        >
+                          <span style={{ fontSize: 15, fontWeight: 700, color: brand.espresso }}>{section.title}</span>
+                          <span style={{ color: brand.clay, fontSize: 18 }}>{isOpen ? "−" : "+"}</span>
+                        </button>
+                        {isOpen && (
+                          <div style={{ padding: "0 20px 16px" }}>
+                            {section.items.map((item, ii) => (
+                              <div key={ii} style={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: 10,
+                                padding: "7px 0",
+                                borderTop: ii === 0 ? `1px solid ${brand.sand}` : "none",
+                              }}>
+                                <div style={{
+                                  width: 18, height: 18, minWidth: 18,
+                                  border: `1.5px solid ${brand.clay}`,
+                                  borderRadius: 3,
+                                  marginTop: 1,
+                                }} />
+                                <span style={{ fontSize: 13.5, color: brand.espresso, lineHeight: 1.5 }}>{item}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* === LAYER 2 === */}
+        {activeTab === "role" && (
+          <div>
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: brand.clay, marginBottom: 6 }}>
+                {roleTrack.subtitle}
+              </div>
+              <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 400 }}>{roleTrack.title}</h2>
+              <p style={{ margin: 0, color: brand.mocha, fontSize: 14, lineHeight: 1.7 }}>
+                This track is tailored to the Key Accounts Manager / B2B Operations role. It runs in parallel with Layer 1 from Week 2, building deep competency in the stockist network, Cin7, and monday CRM.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {roleTrack.pillars.map((pillar, pi) => {
+                const key = `role-${pi}`;
+                const isOpen = expandedSections[key] !== false;
+                return (
+                  <div key={pi} style={{
+                    background: brand.white,
+                    border: `1px solid ${brand.sand}`,
+                    borderLeft: `4px solid ${brand.clay}`,
+                    borderRadius: 8,
+                    overflow: "hidden",
+                  }}>
+                    <button
+                      onClick={() => toggleSection(key)}
+                      style={{
+                        width: "100%",
+                        background: "none",
+                        border: "none",
+                        padding: "16px 20px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        fontFamily: "'Georgia', serif",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <span style={{ color: brand.clay, fontSize: 16 }}>{pillar.icon}</span>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: brand.espresso }}>{pillar.title}</span>
+                      </div>
+                      <span style={{ color: brand.clay, fontSize: 18 }}>{isOpen ? "−" : "+"}</span>
+                    </button>
+                    {isOpen && (
+                      <div style={{ padding: "0 20px 16px" }}>
+                        {pillar.items.map((item, ii) => (
+                          <div key={ii} style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 10,
+                            padding: "7px 0",
+                            borderTop: ii === 0 ? `1px solid ${brand.sand}` : "none",
+                          }}>
+                            <div style={{
+                              width: 18, height: 18, minWidth: 18,
+                              border: `1.5px solid ${brand.clay}`,
+                              borderRadius: 3,
+                              marginTop: 1,
+                            }} />
+                            <span style={{ fontSize: 13.5, color: brand.espresso, lineHeight: 1.5 }}>{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 30/60/90 */}
+            <div style={{ marginTop: 32 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, color: brand.espresso }}>
+                30 / 60 / 90 Day Success Markers — KAM/B2B Ops
+              </h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                {[
+                  {
+                    label: "Day 30", color: brand.sage,
+                    items: ["Knows all systems", "Has read every top account file", "Shadowed KAM on 5+ accounts", "Understands Cin7 B2B portal end-to-end"],
+                  },
+                  {
+                    label: "Day 60", color: brand.mocha,
+                    items: ["Managing own account set independently", "Running weekly reporting", "Reactivation pipeline active", "First new account conversation initiated"],
+                  },
+                  {
+                    label: "Day 90", color: brand.espresso,
+                    items: ["Full ownership of role KPIs", "Contributed to team planning", "Flagging system/process improvements", "Ready to onboard next hire in role"],
+                  },
+                ].map((block, bi) => (
+                  <div key={bi} style={{
+                    background: block.color,
+                    color: brand.white,
+                    borderRadius: 8,
+                    padding: 18,
+                  }}>
+                    <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", marginBottom: 10, opacity: 0.8 }}>
+                      {block.label}
+                    </div>
+                    {block.items.map((item, ii) => (
+                      <div key={ii} style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 4, opacity: 0.95 }}>
+                        · {item}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* === CONTENT LIBRARY === */}
+        {activeTab === "content" && (
+          <div>
+            <p style={{ margin: "0 0 24px", color: brand.mocha, fontSize: 14, lineHeight: 1.7 }}>
+              Every document referenced in the onboarding system needs to exist before you onboard anyone. This is your content gap audit — what's ready, what's in progress, and what needs to be built.
+            </p>
+
+            <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+              {Object.entries(statusColor).map(([s, c]) => (
+                <div key={s} style={{
+                  background: c.bg, color: c.text,
+                  borderRadius: 4, padding: "4px 12px", fontSize: 11,
+                  letterSpacing: 1, textTransform: "uppercase", fontWeight: 700,
+                }}>
+                  {s}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: brand.white, border: `1px solid ${brand.sand}`, borderRadius: 8, overflow: "hidden" }}>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "2fr 1fr 1fr 100px",
+                background: brand.espresso,
+                color: brand.cream,
+                padding: "12px 20px",
+                fontSize: 11,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+              }}>
+                <span>Document</span>
+                <span>Owner</span>
+                <span>Lives In</span>
+                <span>Status</span>
+              </div>
+              {contentLibrary.map((row, ri) => (
+                <div key={ri} style={{
+                  display: "grid",
+                  gridTemplateColumns: "2fr 1fr 1fr 100px",
+                  padding: "14px 20px",
+                  borderBottom: ri < contentLibrary.length - 1 ? `1px solid ${brand.sand}` : "none",
+                  alignItems: "center",
+                  background: ri % 2 === 0 ? brand.white : brand.cream,
+                }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 600, color: brand.espresso }}>{row.doc}</span>
+                  <span style={{ fontSize: 12.5, color: brand.mocha }}>{row.owner}</span>
+                  <span style={{ fontSize: 12.5, color: brand.mocha }}>{row.lives}</span>
+                  <span style={{
+                    display: "inline-block",
+                    background: statusColor[row.status]?.bg,
+                    color: statusColor[row.status]?.text,
+                    borderRadius: 4,
+                    padding: "3px 10px",
+                    fontSize: 10,
+                    letterSpacing: 0.5,
+                    textTransform: "uppercase",
+                    fontWeight: 700,
+                    textAlign: "center",
+                  }}>
+                    {row.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{
+              marginTop: 24,
+              background: brand.sand,
+              borderRadius: 8,
+              padding: 20,
+            }}>
+              <h4 style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: brand.espresso }}>
+                🔑 Priority Build Order
+              </h4>
+              <p style={{ margin: 0, fontSize: 13, color: brand.mocha, lineHeight: 1.7 }}>
+                Before onboarding anyone: <strong>Brand Bible</strong> + <strong>Org Chart</strong> + <strong>Systems Map</strong> must exist (these are non-negotiables).<br />
+                The <strong>monday.com Framework Doc</strong> is already in progress — prioritise completing it.<br />
+                Role-specific docs (Cin7 SOP, Stockist Overview) can be built collaboratively with the new hire as part of their onboarding.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div style={{
+        borderTop: `1px solid ${brand.sand}`,
+        padding: "20px 40px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginTop: 20,
+      }}>
+        <span style={{ fontSize: 11, color: brand.clay, letterSpacing: 2, textTransform: "uppercase" }}>
+          KIKO Vitals · Onboarding Framework v1.0
+        </span>
+        <span style={{ fontSize: 11, color: brand.mocha }}>
+          Next: Build this into monday.com
+        </span>
+      </div>
+    </div>
+  );
+}
